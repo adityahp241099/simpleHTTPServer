@@ -15,19 +15,20 @@ class Request{
 	Request(String URI, BufferedReader bf) throws BadRequest{
 		uri = URI;
 		this.bf = bf;
-		calculatePath();
-		calculateHeaders();
+		parsePath();
+		parseHeaders();
+		parseQuery();
 	}
-	protected void calculatePath() throws BadRequest{
+	protected void parsePath() throws BadRequest{
 		String[] array = uri.split("\\?")[0].split("/");
 		for(int i =0;i<array.length;i++){
 			array[i] = URLDecoder.decode(array[i], StandardCharsets.UTF_8);
 		}
 		path = URLDecoder.decode(uri.split("\\?")[0], StandardCharsets.UTF_8);
 		deconstructedPath = array;
-		parseQuery();
+
 	}
-	protected void calculateHeaders() throws BadRequest{
+	protected void parseHeaders() throws BadRequest{
 		headers = new CaseInsensitiveHashMap<String>();
 		try{
 			String input = bf.readLine();
@@ -41,25 +42,19 @@ class Request{
 		}
 	}
 	protected void parseQuery() throws BadRequest{
-		params = new HashMap<>();
 		if(uri.split("\\?").length>1){
-			String queryStatement = uri.split("\\?",2)[1];
-			String[] queryBlocks = queryStatement.split("&");
-			for (String queryBlock : queryBlocks) {
-				try {
-					String key = URLDecoder.decode(queryBlock.split("=", 2)[0], StandardCharsets.UTF_8);
-					String value = URLDecoder.decode(queryBlock.split("=", 2)[1], StandardCharsets.UTF_8);
-					if (params.containsKey(key)) {
-						params.put(key, params.get(key) + ", " + value);//To handle multiple values for same key
-					} else {
-						params.put(key, value);
-					}
-				} catch (IndexOutOfBoundsException e) {
-					e.printStackTrace();
-					throw new BadRequest("Malformed query parameter");
-				}
+			try{
+				params = HTTPEncodingParser.parse(uri.split("\\?")[1],"urlencoded");
+			}catch (Exception e){
+				e.printStackTrace();
+				throw new BadRequest("Can't Parse Query String");
 			}
+		}else{
+			params = new HashMap<String,String>();
 		}
+
+
+
 	}
 	public String getPath()  {
 		return path;
