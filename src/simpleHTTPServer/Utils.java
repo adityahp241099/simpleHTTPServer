@@ -1,11 +1,7 @@
 package simpleHTTPServer;
 
-import com.sun.jdi.InterfaceType;
-
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.lang.instrument.ClassDefinition;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -16,17 +12,23 @@ import java.util.HashMap;
 
 class CaseInsensitiveHashMap<V> extends HashMap <Object,Object>{
     @Override
+    @SuppressWarnings("unchecked")
     public V put(Object key, Object value) {
+
         return (V) super.put(((String)key).toLowerCase(), value);
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public V  get(Object key) {
+
         return (V) super.get(((String)key).toLowerCase());
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public V getOrDefault(Object key, Object defaultValue) {
+
         return (V) super.getOrDefault(key, defaultValue);
     }
 }
@@ -53,6 +55,7 @@ class HTTPEncodingParser {
         if(!initialized){
             decoderMapping = new HashMap<String, Class>();
             decoderMapping.put("urlencoded",URLEncodedDecoder.class);
+            initialized = true;
         }
         var constructor = decoderMapping.get(encType).getConstructor(String.class);
         Decoder decoder = (Decoder) constructor.newInstance(text);

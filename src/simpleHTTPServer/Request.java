@@ -3,7 +3,7 @@ import java.io.*;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
-import java.util.Map;
+
 
 class Request{
 	protected String path;
@@ -19,7 +19,7 @@ class Request{
 		parseHeaders();
 		parseQuery();
 	}
-	protected void parsePath() throws BadRequest{
+	protected void parsePath(){
 		String[] array = uri.split("\\?")[0].split("/");
 		for(int i =0;i<array.length;i++){
 			array[i] = URLDecoder.decode(array[i], StandardCharsets.UTF_8);

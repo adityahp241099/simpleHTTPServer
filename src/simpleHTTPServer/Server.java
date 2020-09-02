@@ -15,13 +15,8 @@ public class Server {
 		try {
 			this.socket = new ServerSocket();
 			SocketAddress sa = new InetSocketAddress(this.host,this.port);
-			try {
-				this.socket.bind(sa);
-				System.out.println("Server started on "+ this.host +":"+this.port);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			this.socket.bind(sa);
+			System.out.println("Server started on "+ this.host +":"+this.port);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -64,57 +59,39 @@ public class Server {
 class SocketHandler extends Thread{
 	Socket socket;
 	Request request;
-	OutputStream out;
+	Response response;
 	public SocketHandler(Socket socket){
 		this.socket = socket;
-		try {
-			out = socket.getOutputStream();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 	public void run(){
 		try {
-			this.request = new RequestFactory().fetchRequest(socket);
-			System.out.println(request.getParameter("host"));
-			System.out.println(request.getHeaderValue("host"));
-			System.out.print(this.request.getPath());
-			standardResponse();
-			handoverResponse();
+			this.request = new RequestFactory().fetchRequest(socket);//try accepting a request class into response constructor
+			this.response = new StringResponse(socket,"<!DOCTYPE html>\n" +
+					"<html>\n" +
+					"  <head>\n" +
+					"    <title>This is a demo page</title>\n" +
+					"  </head>\n" +
+					"  <body>\n" +
+					"    <div>\n" +
+					"        <p>If you are seeing this, that means server is up!</p>\n" +
+					"    </div>\n" +
+					"  </body>\n" +
+					"</html>");
+			response.send();
+			socket.close();
+
 		}catch(BadRequest e) {
 			e.printStackTrace();
 			//Respond with 400
 		}catch(NotAllowed e) {
 			e.printStackTrace();
 			//Respond with 405
-		}
-		
-	}
-	public void standardResponse() {
-		
-			String httpResponse = "HTTP/1.1 200 OK\r\n\r\n" + "<html>Works<form method='POST'><input name='hi' value='1'><input type='submit' value='Interesting'></form></html>";
-            
-            try {
-				out.write(httpResponse.getBytes("UTF-8"));
-			} catch (UnsupportedEncodingException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}			
-			
-		
-	}
-	public void handoverResponse() {
-		try {
-			out.close();		
-			socket.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+		}catch(IOException e){
+
+		} catch (ResponseDispatchException e) {
+			//Respond with 500;
 			e.printStackTrace();
 		}
+
 	}
-	
 }
