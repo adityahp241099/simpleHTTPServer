@@ -8,7 +8,8 @@ public class Server {
 	private String host;
 	private int port;
 	private ServerSocket socket;
-	public boolean active = false; 
+	public boolean active = false;
+	protected URLMapper urlMapper = new URLMapper();
 	public Server() {
 		this.host = "0.0.0.0";
 		this.port = 8000;
@@ -36,7 +37,7 @@ public class Server {
 			try {
 				Socket clientSocket = this.socket.accept();
 				System.out.println("New Connection");
-				new SocketHandler(clientSocket).start();
+				new SocketHandler(clientSocket,urlMapper).start();
 				
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -44,9 +45,15 @@ public class Server {
 			}
 		}
 	}
-	
+	public void register(String pattern ,View view){
+		urlMapper.register(pattern,view);
+	}
 	public static void main(String[] args) {
 		Server s = new Server();
+		View root = (request)->{
+			return new StringResponse(request,"This Works");
+		};
+		s.register("/",root);
 		s.start();
 	}
 
@@ -60,26 +67,18 @@ class SocketHandler extends Thread{
 	Socket socket;
 	Request request;
 	Response response;
-	public SocketHandler(Socket socket){
+	URLMapper urlMapper;
+	public SocketHandler(Socket socket,URLMapper urlMapper){
 		this.socket = socket;
+		this.urlMapper = urlMapper;
 	}
 	public void run(){
 		try {
 			this.request = new RequestFactory().fetchRequest(socket);//try accepting a request class into response constructor
-			this.response = new StringResponse(socket,"<!DOCTYPE html>\n" +
-					"<html>\n" +
-					"  <head>\n" +
-					"    <title>This is a demo page</title>\n" +
-					"  </head>\n" +
-					"  <body>\n" +
-					"    <div>\n" +
-					"        <p>If you are seeing this, that means server is up!</p>\n" +
-					"    </div>\n" +
-					"  </body>\n" +
-					"</html>");
+			View view = this.urlMapper.resolve(request.getPath());
+			this.response = view.call(this.request);
 			response.send();
 			socket.close();
-
 		}catch(BadRequest e) {
 			e.printStackTrace();
 			//Respond with 400
@@ -87,11 +86,20 @@ class SocketHandler extends Thread{
 			e.printStackTrace();
 			//Respond with 405
 		}catch(IOException e){
-
+			e.printStackTrace();
 		} catch (ResponseDispatchException e) {
 			//Respond with 500;
 			e.printStackTrace();
+		} catch (HTTPException e) {
+			e.printStackTrace();
+			try {
+				e.getResponse(request).send();
+			} catch (ResponseDispatchException responseDispatchException) {
+				responseDispatchException.printStackTrace();
+			}
 		}
-
 	}
 }
+
+
+

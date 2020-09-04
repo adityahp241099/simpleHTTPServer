@@ -6,7 +6,22 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 
+/* <Default Responses> */
+
+class NotFoundResponse extends StringResponse{
+    public NotFoundResponse(Socket socket){
+        super(socket,"The resource you are looking for is not available");
+        code = 404;
+        message = "Not Found";
+    }
+}
+
+/* <Default Responses/> */
+
+
 interface Response {
+    int code = 200;
+    String status = "OK";
     void send() throws ResponseDispatchException;
 }
 
@@ -15,13 +30,19 @@ interface Response {
 class StringResponse implements Response{
     Socket socket;
     String responseString;
+    protected int code = 200;
+    protected String message = "OK";
     StringResponse(Socket socket, String response){
         this.socket = socket;
         this.responseString = response;
     }
+    StringResponse(Request request,String response){
+        this(request.socket,response);
+    }
+
     public void send() throws ResponseDispatchException {
         ResponseWriter rw = new ResponseWriter(socket);
-        rw.write("HTTP/1.1 200 OK\r\n\r\n" );//TODO
+        rw.write("HTTP/1.1 +"+code+" "+message+"\r\n\r\n" );//TODO
         rw.write(responseString);
         rw.close();
     }

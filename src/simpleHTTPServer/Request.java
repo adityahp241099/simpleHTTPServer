@@ -12,9 +12,11 @@ class Request{
 	protected CaseInsensitiveHashMap<String> headers;
 	protected String uri;
 	protected BufferedReader bf;
-	Request(String URI, BufferedReader bf) throws BadRequest{
+	public Socket socket;
+	Request(String URI, BufferedReader bf, Socket socket) throws BadRequest{
 		uri = URI;
 		this.bf = bf;
+		this.socket = socket;
 		parsePath();
 		parseHeaders();
 		parseQuery();
@@ -83,7 +85,7 @@ class RequestFactory{
 			bf = new  BufferedReader(new InputStreamReader(s.getInputStream()));
 			String method = getMethod();
 			String requestURI = getURI();
-			return resolveRequest(method,requestURI,bf);
+			return resolveRequest(method,requestURI,bf,s);
 				
 			
 		} catch (IOException e) {
@@ -115,10 +117,10 @@ class RequestFactory{
 		}
 		return requestLine.split(" ",3)[1];
 	}
-	private Request resolveRequest(String type,String requestURI,BufferedReader bf) throws NotAllowed,BadRequest {
+	private Request resolveRequest(String type,String requestURI,BufferedReader bf,Socket socket) throws NotAllowed,BadRequest {
 		
 		if(type.toLowerCase().equals("get")) {
-			return new GetRequest(requestURI,bf);
+			return new GetRequest(requestURI,bf,socket);
 		}else {
 			try {
 				String input = bf.readLine();
@@ -155,8 +157,8 @@ class NotAllowed extends Exception{
 
 /* All request types come here*/
 class GetRequest extends Request {
-	GetRequest(String URI, BufferedReader bf) throws BadRequest{
-		super(URI,bf);
+	GetRequest(String URI, BufferedReader bf,Socket socket) throws BadRequest{
+		super(URI,bf,socket);
 	}
 }
 
