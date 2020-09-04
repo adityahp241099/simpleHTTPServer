@@ -5,7 +5,7 @@
 ```java
 import simpleHTTPServer.Server;
 import simpleHTTPServer.View;
-import simpleHTTPServer.StringResponse;
+import simpleHTTPServer.response.StringResponse;
 
 class DemoServer{
     public static void main(String[] args){

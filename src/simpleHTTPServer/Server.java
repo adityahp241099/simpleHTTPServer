@@ -1,9 +1,14 @@
 package simpleHTTPServer;
+import simpleHTTPServer.exceptions.*;
+import simpleHTTPServer.request.Request;
+import simpleHTTPServer.request.RequestFactory;
+import simpleHTTPServer.response.Response;
+import simpleHTTPServer.response.*;
+
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.*;
-//import simpleHTTPServer.Request.*;
+//import simpleHTTPServer.Request.Request.*;
 public class Server {
 	private String host;
 	private int port;
@@ -94,7 +99,7 @@ class SocketHandler extends Thread{
 			e.printStackTrace();
 			try {
 				e.getResponse(request).send();
-			} catch (ResponseDispatchException responseDispatchException) {
+			} catch (ResponseDispatchException | NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException responseDispatchException) {
 				responseDispatchException.printStackTrace();
 			}
 		}

@@ -1,5 +1,7 @@
-package simpleHTTPServer;
+package simpleHTTPServer.response;
 
+
+import simpleHTTPServer.exceptions.ResponseDispatchException;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -8,13 +10,7 @@ import java.nio.charset.StandardCharsets;
 
 /* <Default Responses> */
 
-class NotFoundResponse extends StringResponse{
-    public NotFoundResponse(Socket socket){
-        super(socket,"The resource you are looking for is not available");
-        code = 404;
-        message = "Not Found";
-    }
-}
+
 
 /* <Default Responses/> */
 
@@ -30,11 +26,6 @@ public interface Response {
 
 
 
-class ResponseDispatchException extends  Exception{
-    ResponseDispatchException(String message){
-        System.out.println(message);
-    }
-}
 
 
 
