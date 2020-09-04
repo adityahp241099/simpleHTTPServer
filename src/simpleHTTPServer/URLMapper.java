@@ -32,6 +32,3 @@ class InternalSeverError extends Exception{
     }
 }
 
-interface View{
-    public Response call(Request request);
-}

@@ -5,7 +5,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 
 
-class Request{
+public class Request{
 	protected String path;
 	protected String[] deconstructedPath;
 	protected HashMap<String,String> params;
