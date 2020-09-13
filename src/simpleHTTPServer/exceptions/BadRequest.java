@@ -1,7 +1,10 @@
 package simpleHTTPServer.exceptions;
 
-public class BadRequest extends Exception{
+import simpleHTTPServer.response.BadRequestResponse;
+
+public class BadRequest extends HTTPException{
     public BadRequest(String message) {
-        System.out.println(message);
+        super(message,400);
+        defaultResponse = BadRequestResponse.class;
     }
 }

@@ -1,6 +1,7 @@
 package simpleHTTPServer.response;
 
 
+import simpleHTTPServer.exceptions.InternalServerError;
 import simpleHTTPServer.exceptions.ResponseDispatchException;
 
 import java.io.IOException;
@@ -19,6 +20,7 @@ public interface Response {
     int code = 200;
     String status = "OK";
     void send() throws ResponseDispatchException;
+    void submitHeader(String key, String value) throws InternalServerError;
 }
 
 

@@ -52,7 +52,6 @@ public class Request{
 			try{
 				params = HTTPEncodingParser.parse(uri.split("\\?")[1],"urlencoded");
 			}catch (Exception e){
-				e.printStackTrace();
 				throw new BadRequest("Can't Parse Query String");
 			}
 		}else{

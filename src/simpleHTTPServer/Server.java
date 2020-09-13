@@ -79,26 +79,30 @@ class SocketHandler extends Thread{
 	}
 	public void run(){
 		try {
+
 			this.request = new RequestFactory().fetchRequest(socket);//try accepting a request class into response constructor
 			View view = this.urlMapper.resolve(request.getPath());
 			this.response = view.call(this.request);
 			response.send();
 			socket.close();
-		}catch(BadRequest e) {
-			e.printStackTrace();
-			//Respond with 400
-		}catch(NotAllowed e) {
-			e.printStackTrace();
-			//Respond with 405
 		}catch(IOException e){
 			e.printStackTrace();
 		} catch (ResponseDispatchException e) {
-			//Respond with 500;
 			e.printStackTrace();
-		} catch (HTTPException e) {
+
+		}catch(BadRequest e){
+			e.printStackTrace();
+			try {
+				new BadRequestResponse(socket).send();
+				System.out.println("Dispatched automated response");
+			} catch (ResponseDispatchException responseDispatchException) {
+				responseDispatchException.printStackTrace();
+			}
+		}catch (HTTPException e) {
 			e.printStackTrace();
 			try {
 				e.getResponse(request).send();
+				System.out.println("Dispatched automated response");
 			} catch (ResponseDispatchException | NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException responseDispatchException) {
 				responseDispatchException.printStackTrace();
 			}
