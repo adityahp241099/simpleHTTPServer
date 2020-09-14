@@ -95,7 +95,7 @@ class SocketHandler extends Thread{
 			try {
 				new BadRequestResponse(socket).send();
 				System.out.println("Dispatched automated response");
-			} catch (ResponseDispatchException responseDispatchException) {
+			} catch (ResponseDispatchException| InternalServerError responseDispatchException) {
 				responseDispatchException.printStackTrace();
 			}
 		}catch (HTTPException e) {
@@ -103,7 +103,7 @@ class SocketHandler extends Thread{
 			try {
 				e.getResponse(request).send();
 				System.out.println("Dispatched automated response");
-			} catch (ResponseDispatchException | NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException responseDispatchException) {
+			} catch (ResponseDispatchException | NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException | InternalServerError responseDispatchException) {
 				responseDispatchException.printStackTrace();
 			}
 		}

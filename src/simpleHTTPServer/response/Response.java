@@ -19,7 +19,7 @@ import java.nio.charset.StandardCharsets;
 public interface Response {
     int code = 200;
     String status = "OK";
-    void send() throws ResponseDispatchException;
+    void send() throws ResponseDispatchException, InternalServerError;
     void submitHeader(String key, String value) throws InternalServerError;
 }
 
